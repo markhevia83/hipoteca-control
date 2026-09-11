@@ -1,0 +1,13 @@
+{
+  "name": "Hipoteca Control",
+  "short_name": "Hipoteca",
+  "description": "Asesoramientos y cálculo de operaciones hipotecarias.",
+  "lang": "es",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f2f7f4",
+  "theme_color": "#153a33",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
