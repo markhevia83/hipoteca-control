@@ -1,4 +1,4 @@
-const CACHE = "hipoteca-control-v1";
+const CACHE = "hipoteca-control-v2";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", event => {
