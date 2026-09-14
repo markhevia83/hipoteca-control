@@ -1,0 +1,245 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#153a33"><title>Hipoteca Control · Equipo</title><link rel="icon" href="icon.svg"><style>
+:root{color-scheme:light;background:#f2f7f4}body{margin:0;font-family:system-ui,sans-serif;color:#153a33}a{color:#176d5b}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}button:focus-visible,a:focus-visible{outline:3px solid #2a967e;outline-offset:3px}[hidden]{display:none!important}
+
+  #hc-app { --hc-ink: light-dark(#153a33, #e3f0ea); --hc-soft: light-dark(#f2f7f4, #172824); --hc-surface: light-dark(#ffffff, #21352f); --hc-line: light-dark(#d5e1dc, #3e5951); --hc-brand: light-dark(#176d5b, #7ed0b6); --hc-muted: light-dark(#5d706a, #afc5bd); color:var(--hc-ink); font-family:Inter,ui-sans-serif,system-ui,sans-serif; }
+  #hc-app * { box-sizing:border-box; }
+  #hc-app .hc-top { align-items:center; background:var(--hc-ink); color:light-dark(#fff,#17332c); display:flex; justify-content:space-between; margin:0 0 20px; padding:18px 22px; }
+  #hc-app .hc-brand { font-weight:500; letter-spacing:.02em; }
+  #hc-app .hc-brand small { color:light-dark(#b9dcd1,#25473f); display:block; font-size:11px; letter-spacing:.1em; }
+  #hc-app .hc-shell { margin:auto; max-width:1000px; padding:0 8px 28px; }
+  #hc-app h1 { font-size:30px; margin:4px 0; }
+  #hc-app h2 { font-size:20px; margin:0; }
+  #hc-app h3 { font-size:16px; margin:0 0 14px; }
+  #hc-app p { color:var(--hc-muted); margin:5px 0 14px; }
+  #hc-app .hc-head, #hc-app .hc-row { align-items:center; display:flex; gap:12px; justify-content:space-between; }
+  #hc-app .hc-head { align-items:flex-start; flex-wrap:wrap; margin:20px 0; }
+  #hc-app .hc-eyebrow { color:var(--hc-brand); font-size:12px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; }
+  #hc-app .hc-grid { display:grid; gap:14px; grid-template-columns:repeat(3,minmax(0,1fr)); }
+  #hc-app .hc-card { background:var(--hc-surface); border:1px solid var(--hc-line); border-radius:12px; padding:16px; }
+  #hc-app .hc-stat span { color:var(--hc-muted); display:block; font-size:13px; }
+  #hc-app .hc-stat strong { display:block; font-size:26px; margin-top:6px; }
+  #hc-app button { border:0; border-radius:8px; cursor:pointer; font:inherit; font-weight:500; padding:10px 13px; }
+  #hc-app .hc-primary { background:var(--hc-brand); color:light-dark(#fff,#10362d); }
+  #hc-app .hc-subtle { background:var(--hc-soft); color:var(--hc-ink); }
+  #hc-app .hc-danger { color:light-dark(#a42318,#ffb4ab); background:light-dark(#fff0ee,#45201c); }
+  #hc-app .hc-list { display:grid; gap:8px; }
+  #hc-app .hc-case { align-items:center; background:var(--hc-surface); border:1px solid var(--hc-line); border-radius:10px; display:grid; gap:10px; grid-template-columns:1fr auto auto; padding:13px; }
+  #hc-app .hc-case small { color:var(--hc-muted); display:block; margin-top:3px; }
+  #hc-app .hc-badge { background:var(--hc-soft); border-radius:999px; color:var(--hc-brand); font-size:12px; padding:5px 8px; }
+  #hc-app .hc-empty { border:1px dashed var(--hc-line); border-radius:12px; color:var(--hc-muted); padding:36px; text-align:center; }
+  #hc-app .hc-layout { align-items:start; display:grid; gap:18px; grid-template-columns:minmax(0,1fr) 280px; }
+  #hc-app .hc-block { background:var(--hc-surface); border:1px solid var(--hc-line); border-radius:12px; margin-bottom:13px; padding:17px; }
+  #hc-app .hc-fields { display:grid; gap:12px; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #hc-app label { color:var(--hc-ink); display:block; font-size:13px; font-weight:500; margin-bottom:5px; }
+  #hc-app input, #hc-app select, #hc-app textarea { background:var(--hc-surface); border:1px solid var(--hc-line); border-radius:7px; color:var(--hc-ink); font:inherit; min-height:39px; padding:8px; width:100%; }
+  #hc-app textarea { min-height:84px; }
+  #hc-app .hc-mode { background:var(--hc-soft); border-radius:10px; margin:15px 0; padding:12px; }
+  #hc-app .hc-modes { display:grid; gap:8px; grid-template-columns:1fr 1fr; }
+  #hc-app .hc-mode label { align-items:center; border:1px solid var(--hc-line); border-radius:7px; cursor:pointer; display:flex; gap:8px; margin:0; padding:9px; }
+  #hc-app .hc-mode input { accent-color:var(--hc-brand); min-height:auto; width:auto; }
+  #hc-app .hc-summary { position:sticky; top:12px; }
+  #hc-app .hc-summary dl { margin:12px 0 0; }
+  #hc-app .hc-summary dl div { border-bottom:1px solid var(--hc-line); display:flex; font-size:13px; justify-content:space-between; padding:10px 0; }
+  #hc-app .hc-summary dt { color:var(--hc-muted); }
+  #hc-app .hc-summary dd { font-weight:500; margin:0; text-align:right; }
+  #hc-app .hc-tabs { border-bottom:1px solid var(--hc-line); display:flex; gap:4px; margin:20px 0; }
+  #hc-app .hc-tabs button { background:transparent; border-radius:0; color:var(--hc-muted); padding:10px 12px; }
+  #hc-app .hc-tabs button.hc-active { border-bottom:3px solid var(--hc-brand); color:var(--hc-ink); }
+  #hc-app .hc-note { background:light-dark(#fff8de,#3b3214); border-radius:8px; color:light-dark(#66500f,#f4de8a); font-size:12px; margin-top:14px; padding:11px; }
+  #hc-app .hc-table { border-collapse:collapse; font-size:12px; margin-top:12px; width:100%; }
+  #hc-app .hc-table th, #hc-app .hc-table td { border-bottom:1px solid var(--hc-line); padding:7px; text-align:right; }
+  #hc-app .hc-table th:first-child, #hc-app .hc-table td:first-child { text-align:left; }
+  #hc-app details { margin-top:16px; }
+  #hc-app summary { cursor:pointer; font-weight:500; }
+  @media (max-width:700px) { #hc-app .hc-grid { grid-template-columns:1fr; } #hc-app .hc-layout { grid-template-columns:1fr; } #hc-app .hc-summary { position:static; } }
+  @media (max-width:460px) { #hc-app .hc-fields, #hc-app .hc-modes { grid-template-columns:1fr; } #hc-app .hc-case { grid-template-columns:1fr auto; } #hc-app .hc-case button { grid-column:1/-1; } }
+
+#team-account{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 24px;background:#153a33;color:white}#team-account:empty{display:none}#team-account nav{display:flex;gap:8px;flex-wrap:wrap}#team-account button{border:1px solid #92b6aa;color:white;background:transparent;padding:8px;border-radius:6px}#team-message{max-width:1000px;margin:12px auto;padding:8px 16px;min-height:24px}#team-message:empty{padding:0;min-height:0}#team-message.error{color:#9c2117}#hc-app .team-login{max-width:440px;margin:70px auto;padding:28px;background:white;border-radius:16px;border:1px solid #d5e1dc}#hc-app .team-login label{margin-top:18px}#hc-app form button{margin-top:20px}#hc-app .team-login details{margin-bottom:20px}#hc-app .team-notice{font-size:16px;line-height:1.6;color:#153a33;margin:24px 0}#team-directory{display:grid;gap:10px}#hc-app .hc-top{display:none}
+</style></head><body><header id="team-account"></header><div id="team-message" role="status"></div><main id="hc-app"></main><noscript>Activa JavaScript para abrir tu espacio de trabajo.</noscript><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.102.0/dist/umd/supabase.js" integrity="sha384-poKfwTwdwtKSNytBl3naRZbL6oWsW0sXebHBBcIdv25HCh9elYfWO0B7QjfL8yZq" crossorigin="anonymous"></script><script>
+async function prepareTeamCache(){
+ if(!('serviceWorker' in navigator))return;
+ const registration=await navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'});
+ await registration.update();
+ const deadline=Date.now()+15000;
+ while(Date.now()<deadline){
+   const safe=await new Promise(resolve=>{const channel=new MessageChannel();const timeout=setTimeout(()=>{channel.port1.close();resolve(false)},300);channel.port1.onmessage=e=>{clearTimeout(timeout);channel.port1.close();resolve(e.data===true)};navigator.serviceWorker.controller?.postMessage('hc-team-cache-safe',[channel.port2]);});
+   if(safe)return;
+   await new Promise(resolve=>setTimeout(resolve,150));
+ }
+ throw Error('La actualización del acceso aún no ha terminado. Cierra esta pestaña y vuelve a abrirla.');
+}
+async function launchTeam(){
+try{await prepareTeamCache();if(!window.supabase)throw Error('No se ha podido cargar el acceso. Comprueba la conexión y recarga esta página.');
+(() => {
+  const root = document.getElementById('hc-app');
+  
+  const rates = {'Andalucía':7,'Aragón':8,'Asturias':8,'Illes Balears':8,'Canarias':6.5,'Cantabria':9,'Castilla-La Mancha':9,'Castilla y León':8,'Cataluña':10,'Comunitat Valenciana':10,'Extremadura':8,'Galicia':8,'Comunidad de Madrid':6,'Región de Murcia':8,'Navarra':6,'País Vasco':4,'La Rioja':7};
+  let cases = [];
+  let current = null, tab = 'datos';
+  const euro = n => new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(+n || 0);
+  const safe = s => String(s || '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const applicant = () => ({name:'',age:'',employment:'ajena',contract:'',tenure:'',income:'',pays:'14',activity:'',autonomoYears:'',monthlyProfit:'',annualProfit:'',bank:'',asnef:'Pendiente'});
+  const fresh = () => ({id:crypto.randomUUID(),name:'',status:'Nuevo',applicants:[applicant(),applicant()],loans:[],savings:'',price:'',community:'',fixed:'3000',agency:'',finance:'',mortgageType:'fija',rate:'3',variableRate:'3.5',mixedYears:'5',openingCommission:'0',financeCommission:false,insurance:'0',pensionPlan:'0',paymentProtection:'0',followups:[]});
+  const option = (values, selected) => values.map(v=>`<option ${v===selected?'selected':''}>${safe(v)}</option>`).join('');
+  const annuity = (balance, annualRate, months) => { const r=annualRate/1200; return months&&balance?(r?balance*r*Math.pow(1+r,months)/(Math.pow(1+r,months)-1):balance/months):0; };
+  const moneyFields = () => { const c=current, base=+c.price||0, itp=c.community ? base*(rates[c.community]/100) : 0, costs=itp+(+c.fixed||0)+(+c.agency||0)+(+c.finance||0), baseMortgage=Math.max(0,base+costs-(+c.savings||0)), openingFee=baseMortgage*(+c.openingCommission||0)/100, mortgage=baseMortgage+(c.financeCommission?openingFee:0), loanMonthly=(c.loans||[]).reduce((sum,l)=>sum+(+l.payment||0),0), incomeMonthly=c.applicants.reduce((sum,a)=>sum+(a.employment==='ajena'?(+a.income||0)*(+a.pays||0)/12:(+a.monthlyProfit||(+a.annualProfit||0)/12)),0), maxDebt=incomeMonthly*.35, productsMonthly=(+c.insurance||0)+(+c.pensionPlan||0)+(+c.paymentProtection||0), available=maxDebt-loanMonthly-productsMonthly, olderAge=Math.max(...c.applicants.map(a=>+a.age||0)), termYears=olderAge?Math.max(0,75-olderAge):0, months=termYears*12, firstRate=c.mortgageType==='variable'?(+c.variableRate||0):(+c.rate||0), mortgagePayment=annuity(mortgage,firstRate,months), debtMonthly=loanMonthly+productsMonthly+mortgagePayment; return {itp,costs,baseMortgage,openingFee,mortgage,pct:base?mortgage/base*100:0,loanMonthly,incomeMonthly,maxDebt,productsMonthly,available,olderAge,termYears,mortgagePayment,debtMonthly,debtRatio:incomeMonthly?debtMonthly/incomeMonthly*100:0}; };
+  function amortization(){ const f=moneyFields(), c=current, months=f.termYears*12; if(!months||!f.mortgage) return []; let balance=f.mortgage, payment=annuity(balance,c.mortgageType==='variable'?(+c.variableRate||0):(+c.rate||0),months), rows=[], mixedAt=Math.min(months,(+c.mixedYears||0)*12); for(let n=1;n<=months;n++){ const annual=c.mortgageType==='fija'?(+c.rate||0):c.mortgageType==='variable'?(+c.variableRate||0):(n>mixedAt?(+c.variableRate||0):(+c.rate||0)); if(c.mortgageType==='mixta'&&n===mixedAt+1) payment=annuity(balance,annual,months-mixedAt); const interest=balance*annual/1200, principal=Math.min(balance,Math.max(0,payment-interest)), paid=principal+interest; balance=Math.max(0,balance-principal); rows.push({n,paid,interest,principal,balance}); } return rows; }
+  function dashboard(){ current=null; root.innerHTML=`<div class="hc-top"><div class="hc-brand">hipoteca.<small>Asesoramientos</small></div></div><div class="hc-shell"><div class="hc-head"><div><div class="hc-eyebrow">Tu cartera de clientes</div><h1>Todos los expedientes</h1><p>Consulta tus asesoramientos y retómalos cuando quieras.</p></div><button class="hc-primary" data-new>Nuevo expediente</button></div><div class="hc-grid"><div class="hc-card hc-stat"><span>Expedientes activos</span><strong>${cases.filter(c=>c.status!=='Firmada').length}</strong></div><div class="hc-card hc-stat"><span>Gestiones registradas</span><strong>${cases.reduce((n,c)=>n+c.followups.length,0)}</strong></div><div class="hc-card hc-stat"><span>Hipotecas firmadas</span><strong>${cases.filter(c=>c.status==='Firmada').length}</strong></div></div><div class="hc-head"><h2>Asesoramientos</h2><button class="hc-subtle" data-new>+ Crear expediente</button></div><div class="hc-list">${cases.length?cases.map(c=>`<div class="hc-case"><div><strong>${safe(c.name||'Expediente sin nombre')}</strong><small>${safe(c.applicants.map(a=>a.name).filter(Boolean).join(' · ')||'Sin titulares indicados')}</small></div><span class="hc-badge">${safe(c.status)}</span><button class="hc-subtle" data-open="${c.id}">Abrir</button></div>`).join(''):'<div class="hc-empty">Aún no hay expedientes. Crea el primero para empezar.</div>'}</div></div>`; root.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>edit(fresh())); root.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>edit(cases.find(c=>c.id===b.dataset.open))); teamDashboard(); }
+  function edit(c){ current=structuredClone(c); current.loans ||= []; current.rate ||= '3'; current.variableRate ||= '3.5'; current.mortgageType ||= 'fija'; current.mixedYears ||= '5'; current.openingCommission ||= '0'; current.insurance ||= '0'; current.pensionPlan ||= '0'; current.paymentProtection ||= '0'; while(current.applicants.length<2) current.applicants.push(applicant()); tab='datos'; savedSnapshot=JSON.stringify(current); render(); }
+  function summaryView(){ const f=moneyFields(), room=f.available-f.mortgagePayment; return `<h2>Resumen económico</h2><dl><div><dt>Precio vivienda</dt><dd>${euro(current.price)}</dd></div><div><dt>ITP estimado</dt><dd>${current.community?euro(f.itp):'Pendiente'}</dd></div><div><dt>Total gastos</dt><dd>${euro(f.costs)}</dd></div><div><dt>Ahorros</dt><dd>${euro(current.savings)}</dd></div><div><dt>Hipoteca necesaria</dt><dd>${euro(f.mortgage)}</dd></div><div><dt>Financiación / precio</dt><dd>${current.price?f.pct.toFixed(1)+' %':'—'}</dd></div></dl><h3 style="margin:18px 0 4px">Capacidad de endeudamiento</h3><dl><div><dt>Ingresos netos / mes</dt><dd>${euro(f.incomeMonthly)}</dd></div><div><dt>Límite al 35 %</dt><dd>${euro(f.maxDebt)}</dd></div><div><dt>Cuotas de préstamos</dt><dd>${euro(f.loanMonthly)}</dd></div><div><dt>Margen para nueva hipoteca</dt><dd>${euro(f.available)}</dd></div><div><dt>Plazo máximo por edad</dt><dd>${f.termYears?f.termYears+' años':'Pendiente'}</dd></div><div><dt>Nueva hipoteca estimada</dt><dd>${euro(f.mortgagePayment)}</dd></div><div><dt>Resultado de la operación</dt><dd>${f.incomeMonthly?(room>=0?'Dentro del margen':'Supera '+euro(Math.abs(room))):'Pendiente'}</dd></div><div><dt>Endeudamiento total</dt><dd>${f.incomeMonthly?f.debtRatio.toFixed(1)+' %':'Pendiente'}</dd></div></dl>`; }
+  function render(){ root.innerHTML=`<div class="hc-top"><div class="hc-brand">hipoteca.<small>Asesoramientos</small></div></div><div class="hc-shell"><div class="hc-head"><div><button class="hc-subtle" data-back>← Expedientes</button><div class="hc-eyebrow">Nuevo asesoramiento</div><h1>${safe(current.name||'Nuevo expediente')}</h1></div><button class="hc-primary" data-save>Guardar expediente</button></div><div class="hc-block"><div class="hc-fields"><div><label>Nombre del expediente *</label><input data-root="name" value="${safe(current.name)}" placeholder="Ej. Familia García"></div><div><label>Estado</label><select data-root="status">${option(['Nuevo','En estudio','Pendiente de documentación','Firmada','Descartada'],current.status)}</select></div></div></div><div class="hc-tabs"><button class="${tab==='datos'?'hc-active':''}" data-tab="datos">Cuestionario</button><button class="${tab==='calculo'?'hc-active':''}" data-tab="calculo">Operación de compra</button><button class="${tab==='seguimiento'?'hc-active':''}" data-tab="seguimiento">Seguimiento</button></div><div class="hc-layout"><div>${tab==='datos'?dataView():tab==='calculo'?calculatorView():followupView()}</div><aside class="hc-card hc-summary">${summaryView()}</aside></div></div>`; bind(); }
+  function applicantView(a,i){ const k=`data-ai="${i}"`; return `<section class="hc-block"><h2>Titular ${i+1}</h2><div class="hc-fields"><div><label>Nombre</label><input ${k} data-field="name" value="${safe(a.name)}"></div><div><label>Edad</label><input type="number" ${k} data-field="age" value="${safe(a.age)}"></div></div><div class="hc-mode"><label>Situación laboral</label><div class="hc-modes"><label><input type="radio" name="employment-${i}" ${k} data-field="employment" value="ajena" ${a.employment==='ajena'?'checked':''}> Trabajador por cuenta ajena</label><label><input type="radio" name="employment-${i}" ${k} data-field="employment" value="propia" ${a.employment==='propia'?'checked':''}> Trabajador por cuenta propia</label></div></div>${a.employment==='ajena'?`<div class="hc-fields"><div><label>Tipo de contrato</label><select ${k} data-field="contract">${option(['Pendiente','Indefinido','Temporal','Funcionario','Fijo discontinuo','Otro'],a.contract||'Pendiente')}</select></div><div><label>Antigüedad laboral</label><input ${k} data-field="tenure" value="${safe(a.tenure)}" placeholder="Ej. 3 años y 4 meses"></div><div><label>Ingresos netos por paga (€)</label><input type="number" ${k} data-field="income" value="${safe(a.income)}"></div><div><label>Número de pagas</label><input type="number" ${k} data-field="pays" value="${safe(a.pays)}"></div></div>`:`<div class="hc-fields"><div><label>Actividad profesional o empresa</label><input ${k} data-field="activity" value="${safe(a.activity)}"></div><div><label>Antigüedad como autónomo</label><input ${k} data-field="autonomoYears" value="${safe(a.autonomoYears)}" placeholder="Ej. 4 años"></div><div><label>Rendimiento neto mensual (€)</label><input type="number" ${k} data-field="monthlyProfit" value="${safe(a.monthlyProfit)}"></div><div><label>Beneficio neto anual declarado (€)</label><input type="number" ${k} data-field="annualProfit" value="${safe(a.annualProfit)}"></div></div>`}<div class="hc-fields" style="margin-top:12px"><div><label>Banco o bancos</label><input ${k} data-field="bank" value="${safe(a.bank)}"></div><div><label>¿Figura en ASNEF?</label><select ${k} data-field="asnef">${option(['Pendiente','Sí','No'],a.asnef)}</select></div></div></section>`; }
+  function loansView(){ return `<section class="hc-block"><div class="hc-head"><div><h2>Préstamos actuales</h2><p>Añade una fila por cada préstamo; se suman todas las cuotas para calcular el margen disponible.</p></div><button class="hc-subtle" data-add-loan>+ Añadir préstamo</button></div>${current.loans.length?current.loans.map((l,i)=>`<div class="hc-card" style="margin-top:10px"><div class="hc-fields"><div><label>Titular</label><select data-loan="${i}" data-field="holder">${option(['Titular 1','Titular 2','Ambos'],l.holder||'Titular 1')}</select></div><div><label>Entidad</label><input data-loan="${i}" data-field="bank" value="${safe(l.bank)}" placeholder="Ej. Santander"></div><div><label>Concepto</label><input data-loan="${i}" data-field="concept" value="${safe(l.concept)}" placeholder="Ej. Coche"></div><div><label>Cuota mensual (€)</label><input type="number" data-loan="${i}" data-field="payment" value="${safe(l.payment)}"></div><div><label>Saldo pendiente (€)</label><input type="number" data-loan="${i}" data-field="balance" value="${safe(l.balance)}"></div><div><label>&nbsp;</label><button class="hc-danger" data-remove-loan="${i}">Quitar préstamo</button></div></div></div>`).join(''):'<div class="hc-empty">No hay préstamos registrados. Pulsa “Añadir préstamo” tantas veces como necesites.</div>'}</section>`; }
+  function dataView(){ return `${current.applicants.map(applicantView).join('')}${loansView()}<section class="hc-block"><h2>Ahorros y aval</h2><div class="hc-fields"><div><label>Ahorros conjuntos disponibles (€)</label><input type="number" data-root="savings" value="${safe(current.savings)}"></div><div><label>¿Existe posibilidad de aval?</label><select><option>Pendiente</option><option>Sí</option><option>No</option></select></div></div></section>`; }
+  function calculatorView(){ const f=moneyFields(), rows=amortization(); const table=rows.length?`<details><summary>Ver cuadro de amortización · ${rows.length} cuotas</summary><table class="hc-table"><thead><tr><th>Mes</th><th>Cuota</th><th>Intereses</th><th>Capital</th><th>Pendiente</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.n}</td><td>${euro(r.paid)}</td><td>${euro(r.interest)}</td><td>${euro(r.principal)}</td><td>${euro(r.balance)}</td></tr>`).join('')}</tbody></table></details>`:''; return `<section class="hc-block"><div class="hc-eyebrow">Cálculo de la operación</div><h2>Operación de compra</h2><div class="hc-fields"><div><label>Precio de la vivienda (€) *</label><input type="number" min="0" data-root="price" value="${safe(current.price)}"></div><div><label>Aportación / ahorros (€)</label><input type="number" min="0" data-root="savings" value="${safe(current.savings)}"></div><div><label>Tipo de hipoteca</label><select data-root="mortgageType">${option(['fija','variable','mixta'],current.mortgageType)}</select></div><div><label>Interés fijo / inicial (%)</label><input type="number" step="0.01" data-root="rate" value="${safe(current.rate)}"></div><div><label>Interés variable estimado (%)</label><input type="number" step="0.01" data-root="variableRate" value="${safe(current.variableRate)}"></div><div><label>Años a interés fijo en mixta</label><input type="number" data-root="mixedYears" value="${safe(current.mixedYears)}"></div><div><label>Comisión de apertura (%)</label><input type="number" step="0.01" data-root="openingCommission" value="${safe(current.openingCommission)}"></div><div><label><input type="checkbox" data-check="financeCommission" ${current.financeCommission?'checked':''}> Financiar la comisión de apertura</label></div><div><label>Seguros mensuales (€)</label><input type="number" data-root="insurance" value="${safe(current.insurance)}"></div><div><label>Plan de pensiones mensual (€)</label><input type="number" data-root="pensionPlan" value="${safe(current.pensionPlan)}"></div><div><label>Protección de pagos mensual (€)</label><input type="number" data-root="paymentProtection" value="${safe(current.paymentProtection)}"></div><div><label>Años máximos (75 − edad mayor)</label><input data-term value="${f.termYears?f.termYears+' años':'Introduce edades'}" readonly></div></div><div class="hc-head" style="margin-top:16px"><strong data-payment-summary>Hipoteca: ${euro(f.mortgage)} · cuota inicial ${euro(f.mortgagePayment)}/mes</strong><button class="hc-primary" data-calculate>Calcular financiación</button></div><div data-amortization>${table}</div><div class="hc-note">Los seguros, el plan de pensiones y la protección de pagos se suman a la cuota para el análisis de endeudamiento. En hipoteca mixta, la cuota se recalcula al terminar el tramo fijo.</div></section>`; }
+  function followupView(){ return `<section class="hc-block"><div class="hc-head"><div><h2>Seguimiento</h2><p>Registra llamadas y próximos pasos.</p></div><button class="hc-subtle" data-followup>+ Añadir gestión</button></div>${current.followups.length?current.followups.map(f=>`<div class="hc-card"><strong>${safe(f.date)}</strong><p>${safe(f.note)}</p></div>`).join(''):'<div class="hc-empty">Aún no hay gestiones registradas.</div>'}</section>`; }
+  // Update calculated output without replacing the inputs during blur/click.
+  function updateComputed(){
+    const side=root.querySelector('.hc-summary');
+    if(side) side.innerHTML=summaryView();
+    root.querySelector('h1').textContent=current.name||'Nuevo expediente';
+    if(tab!=='calculo') return;
+    const f=moneyFields();
+    root.querySelector('[data-term]').value=f.termYears?f.termYears+' años':'Introduce edades';
+    root.querySelector('[data-payment-summary]').textContent='Hipoteca: '+euro(f.mortgage)+' · cuota inicial '+euro(f.mortgagePayment)+'/mes';
+    const output=root.querySelector('[data-amortization]');
+    const expanded=output.querySelector('details')?.open;
+    const template=document.createElement('template');
+    template.innerHTML=calculatorView();
+    output.innerHTML=template.content.querySelector('[data-amortization]').innerHTML;
+    if(expanded && output.querySelector('details')) output.querySelector('details').open=true;
+  }
+  function bind(){ root.querySelector('[data-back]').onclick=()=>{if(leave())loadCases()}; root.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()}); root.querySelectorAll('[data-root]').forEach(el=>{const sync=()=>{current[el.dataset.root]=el.value;updateComputed()};el.oninput=sync;el.onchange=sync}); root.querySelectorAll('[data-check]').forEach(el=>el.onchange=()=>{current[el.dataset.check]=el.checked;updateComputed()}); root.querySelector('[data-calculate]')?.addEventListener('click',()=>updateComputed()); root.querySelectorAll('[data-ai]').forEach(el=>{const set=()=>{const a=current.applicants[+el.dataset.ai];a[el.dataset.field]=el.value;if(el.dataset.field==='employment')render();else updateComputed()};el.onchange=set;el.oninput=el.type==='number'||el.type==='text'?set:null}); root.querySelector('[data-add-loan]')?.addEventListener('click',()=>{current.loans.push({holder:'Titular 1',bank:'',concept:'',payment:'',balance:''});render()}); root.querySelectorAll('[data-loan]').forEach(el=>{const set=()=>{current.loans[+el.dataset.loan][el.dataset.field]=el.value;updateComputed()};el.oninput=set;el.onchange=set}); root.querySelectorAll('[data-remove-loan]').forEach(b=>b.onclick=()=>{current.loans.splice(+b.dataset.removeLoan,1);render()}); root.querySelector('[data-save]').onclick=saveTeam; root.querySelector('[data-followup]')?.addEventListener('click',()=>{const note=prompt('Describe la gestión:');if(note?.trim()){current.followups.unshift({date:new Date().toLocaleDateString('es-ES'),note});render()}}); }
+  const NOTICE='Espacio de trabajo de la empresa. La administración puede consultar los asesoramientos registrados.';
+  const api=window.supabase.createClient('https://qfogjutoaoacmuuqvrgc.supabase.co','sb_publishable_NgQpq33LyVYC2EWuIWM-sw_CmfSWhD6',{
+    auth:{storage:sessionStorage,storageKey:'hc-team-auth-v1',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+  });
+  let member=null,members=[],records=new Map(),savedSnapshot='',saving=false,viewEpoch=0;
+  const accountBar=document.getElementById('team-account');
+  const messageBox=document.getElementById('team-message');
+  function message(text,error=false){messageBox.textContent=text;messageBox.setAttribute('role',error?'alert':'status');messageBox.className=error?'error':'';}
+  function check(result){if(result.error)throw result.error;return result.data;}
+  function dirty(){return current && JSON.stringify(current)!==savedSnapshot;}
+  function leave(){return !dirty()||confirm('Hay cambios sin guardar. ¿Quieres salir sin guardarlos?');}
+  window.addEventListener('beforeunload',e=>{if(dirty()){e.preventDefault();e.returnValue='';}});
+  function readableError(e){
+    if(e?.message?.includes('Invalid login'))return 'El correo o la contraseña no son correctos.';
+    if(e?.message?.includes('Email not confirmed'))return 'Confirma tu correo antes de entrar.';
+    if(e?.message?.includes('email_address_not_authorized')||e?.code==='email_address_not_authorized')return 'El envío de correos todavía necesita configuración. Contacta con la administración.';
+    if(e?.status===429)return 'Demasiados intentos. Espera unos minutos y vuelve a intentarlo.';
+    return e?.message?.startsWith('CONFLICT:')?e.message.slice(9):'No se ha podido completar la operación. Comprueba la conexión y vuelve a intentarlo. Tus cambios en pantalla se conservan.';
+  }
+  function account(){
+    accountBar.innerHTML=member?`<span>${safe(member.display_name)} · ${member.role==='admin'?'Administrador':'Empleado'}</span><nav><button id="team-info">Información de la cuenta</button>${member.role==='admin'?'<button id="team-manage">Equipo</button>':''}<button id="team-out">Cerrar sesión</button></nav>`:'';
+    document.getElementById('team-info')?.addEventListener('click',()=>alert(NOTICE));
+    document.getElementById('team-manage')?.addEventListener('click',()=>{if(leave())manageTeam();});
+    document.getElementById('team-out')?.addEventListener('click',async()=>{
+      if(!leave())return;
+      viewEpoch++;current=null;cases=[];records.clear();members=[];member=null;account();root.innerHTML='';
+      const result=await api.auth.signOut({scope:'local'});
+      login();message(result.error?'Sesión cerrada en este dispositivo. Comprueba la conexión antes de volver a entrar.':'Sesión cerrada.',!!result.error);
+    });
+  }
+  function login(){
+    current=null;member=null;cases=[];records.clear();members=[];account();
+    root.innerHTML=`<section class="hc-shell team-login"><div class="hc-eyebrow">Hipoteca Control · Equipo</div><h1>Tu espacio de trabajo</h1><p>Entra con tu cuenta para continuar tus asesoramientos.</p><form id="team-login"><label for="team-email">Correo electrónico</label><input id="team-email" type="email" autocomplete="username" required><label for="team-password">Contraseña</label><input id="team-password" type="password" autocomplete="current-password" required><button class="hc-primary" type="submit">Entrar</button></form><details><summary>Primer acceso</summary><p>Si la administración ha habilitado tu correo, crea tu contraseña y confirma el mensaje que recibirás.</p><button class="hc-subtle" id="team-register">Crear mi cuenta</button></details><button class="hc-subtle" id="team-reset">He olvidado mi contraseña</button><p><a href="./index.html">Abrir mis expedientes de este ordenador</a></p></section>`;
+    const credentials=()=>({email:document.getElementById('team-email').value.trim(),password:document.getElementById('team-password').value});
+    const run=async(fn)=>{const buttons=root.querySelectorAll('button');buttons.forEach(b=>b.disabled=true);message('Conectando…');try{await fn();}catch(e){message(readableError(e),true);}finally{buttons.forEach(b=>b.disabled=false);}};
+    document.getElementById('team-login').onsubmit=e=>{e.preventDefault();run(async()=>{check(await api.auth.signInWithPassword(credentials()));await enter();});};
+    document.getElementById('team-register').closest('details').innerHTML='<summary>Primer acceso</summary><p>Abre el enlace de activación que te facilite la administración para elegir tu contraseña.</p>';
+    document.getElementById('team-reset').onclick=()=>{
+      message('Contacta con la administración para recuperar tu acceso. La recuperación automática por correo todavía no está habilitada.');
+    };
+  }
+  async function enter(){
+    const epoch=++viewEpoch;
+    const user=check(await api.auth.getUser()).user;
+    check(await api.rpc('hc_team_join'));
+    const profile=check(await api.from('hc_team_members').select('*').eq('user_id',user.id).maybeSingle());
+    if(epoch!==viewEpoch)return;
+    if(!profile?.active){login();message('Esta cuenta todavía no tiene acceso al equipo. Contacta con la administración.',true);return;}
+    member=profile;account();
+    const notice=check(await api.from('hc_team_notices').select('accepted_at').eq('user_id',member.user_id).maybeSingle());
+    if(epoch!==viewEpoch)return;
+    if(!notice){
+      root.innerHTML=`<section class="hc-shell team-login"><div class="hc-eyebrow">Bienvenido, ${safe(member.display_name)}</div><h1>Antes de empezar</h1><p class="team-notice">${NOTICE}</p><button class="hc-primary" id="team-accept">Entendido y continuar</button></section>`;
+      document.getElementById('team-accept').onclick=async()=>{
+        const b=document.getElementById('team-accept');b.disabled=true;
+        try{const result=await api.from('hc_team_notices').insert({user_id:member.user_id});if(result.error?.code!=='23505')check(result);await loadCases();}catch(e){message(readableError(e),true);b.disabled=false;}
+      };message('');return;
+    }
+    await loadCases();
+  }
+  async function loadCases(){
+    const epoch=++viewEpoch;message('Cargando asesoramientos…');
+    try{
+      const profiles=check(await api.from('hc_team_members').select('*'));
+      let rows=[],from=0;
+      while(true){const page=check(await api.from('hc_team_cases').select('*').order('id').range(from,from+499));rows.push(...page);if(page.length<500)break;from+=500;}
+      if(epoch!==viewEpoch||!member)return;
+      members=profiles;records=new Map(rows.map(r=>[r.id,r]));
+      cases=rows.sort((a,b)=>b.updated_at.localeCompare(a.updated_at)).map(r=>({...r.payload,id:r.id}));
+      dashboard();message('Actualizado a las '+new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}));
+    }catch(e){if(epoch===viewEpoch)message(readableError(e),true);}
+  }
+  function teamDashboard(){
+    root.querySelector('h1').textContent=member.role==='admin'?'Asesoramientos del equipo':'Mis asesoramientos';
+    const tools=document.createElement('div');tools.className='hc-head';
+    tools.innerHTML=`<button class="hc-subtle" id="team-refresh">Actualizar</button>${member.role==='admin'?`<label>Responsable <select id="team-filter"><option value="">Todo el equipo</option>${members.map(m=>`<option value="${safe(m.user_id)}">${safe(m.display_name)}</option>`).join('')}</select></label>`:''}`;
+    root.querySelector('.hc-list').before(tools);
+    document.getElementById('team-refresh').onclick=loadCases;
+    root.querySelectorAll('[data-open]').forEach(b=>{
+      const record=records.get(b.dataset.open);const row=b.closest('.hc-case');row.dataset.owner=record.owner_id;
+      const small=document.createElement('small');small.textContent=(members.find(m=>m.user_id===record.owner_id)?.display_name||'Empleado')+' · '+new Date(record.updated_at).toLocaleString('es-ES');row.firstElementChild.append(small);
+    });
+    document.getElementById('team-filter')?.addEventListener('change',e=>root.querySelectorAll('.hc-case').forEach(r=>r.hidden=!!e.target.value&&r.dataset.owner!==e.target.value));
+  }
+  async function saveTeam(){
+    if(saving)return;
+    if(!current.name.trim()){message('Indica un nombre para el expediente.',true);return;}
+    saving=true;const button=root.querySelector('[data-save]');button.disabled=true;
+    const payload=structuredClone(current),known=records.get(payload.id),epoch=viewEpoch;
+    message('Guardando…');
+    try{
+      const result=known?await api.from('hc_team_cases').update({payload}).eq('id',payload.id).eq('version',known.version).select().maybeSingle():await api.from('hc_team_cases').insert({id:payload.id,payload}).select().single();
+      const row=check(result);
+      if(!row)throw new Error('CONFLICT:Otra persona ha modificado este expediente o tu acceso ha cambiado. Tus cambios siguen en pantalla. Copia las notas que necesites y vuelve a abrir el expediente antes de guardar.');
+      if(epoch!==viewEpoch||!member)return;
+      records.set(row.id,row);const i=cases.findIndex(c=>c.id===row.id);if(i<0)cases.unshift(payload);else cases[i]=payload;
+      savedSnapshot=JSON.stringify(payload);message('Expediente guardado en el equipo.');
+    }catch(e){message(readableError(e),true);}finally{saving=false;button.disabled=false;}
+  }
+  async function manageTeam(){
+    current=null;message('');
+    root.innerHTML=`<section class="hc-shell"><button class="hc-subtle" id="team-back">← Expedientes</button><h1>Equipo</h1><p>Cada empleado accede a sus expedientes. Como administrador puedes consultar los de todo el equipo.</p><form id="team-invite" class="hc-block"><h2>Habilitar un empleado</h2><label for="invite-name">Nombre</label><input id="invite-name" maxlength="100" required><label for="invite-email">Correo</label><input id="invite-email" type="email" maxlength="254" required><button class="hc-primary">Habilitar acceso</button></form><p>Comparte este enlace con el empleado después de habilitar su correo:</p><p><a href="./equipo.html">${safe(location.origin+location.pathname)}</a></p><div id="team-directory">Cargando equipo…</div></section>`;
+    document.getElementById('team-back').onclick=loadCases;
+    async function directory(){
+      const invitations=check(await api.from('hc_team_invitations').select('*').order('created_at'));const el=document.getElementById('team-directory');
+      if(!el)return;
+      el.innerHTML=invitations.map(i=>`<div class="hc-card"><strong>${safe(i.display_name)}</strong><p>${safe(i.email)} · ${i.claimed_by?'Cuenta activada':'Pendiente del primer acceso'}</p>${!i.claimed_by?`<button class="hc-subtle" data-invite-link="${safe(i.email)}">Preparar enlace de activación</button><div data-link-output></div>`:''}</div>`).join('')||'<p>No hay empleados habilitados todavía.</p>';
+      el.querySelectorAll('[data-invite-link]').forEach(b=>b.onclick=async()=>{
+        b.disabled=true;try{
+          const result=await api.functions.invoke('hc-team-invite',{body:{email:b.dataset.inviteLink}});
+          if(result.error){let detail;try{detail=await result.error.context?.json();}catch{}throw new Error('CONFLICT:'+(detail?.error||'No se pudo preparar el enlace. Vuelve a entrar e inténtalo de nuevo.'));}
+          const output=b.parentElement.querySelector('[data-link-output]');
+          output.innerHTML='<p>Entrega este enlace solo a la persona indicada. Es de un solo uso y caduca; si caduca puedes preparar otro.</p><label>Enlace de activación<input readonly></label>';
+          output.querySelector('input').value=result.data.link;
+          output.querySelector('input').onclick=e=>e.target.select();
+          message('Enlace preparado. No se ha enviado ningún correo.');
+        }catch(e){message(readableError(e),true);}finally{b.disabled=false;}
+      });
+    }
+    document.getElementById('team-invite').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('button');b.disabled=true;try{check(await api.rpc('hc_team_invite',{p_email:document.getElementById('invite-email').value.trim(),p_name:document.getElementById('invite-name').value.trim()}));message('Correo habilitado. Puedes compartir el enlace con el empleado.');e.target.reset();await directory();}catch(err){message(readableError(err),true);}finally{b.disabled=false;}};
+    try{await directory();}catch(e){message(readableError(e),true);}
+  }
+  let recovering=location.hash.includes('type=recovery')||location.hash.includes('type=invite');
+  function passwordForm(){current=null;root.innerHTML='<section class="hc-shell team-login"><h1>Nueva contraseña</h1><form id="new-password-form"><label for="new-password">Contraseña (al menos 12 caracteres)</label><input id="new-password" type="password" autocomplete="new-password" minlength="12" required><button class="hc-primary">Guardar contraseña</button></form></section>';document.getElementById('new-password-form').onsubmit=async e=>{e.preventDefault();try{check(await api.auth.updateUser({password:document.getElementById('new-password').value}));recovering=false;await enter();message('Contraseña actualizada.');}catch(err){message(readableError(err),true);}};}
+  api.auth.onAuthStateChange((event)=>{if(event==='PASSWORD_RECOVERY'){recovering=true;setTimeout(passwordForm,0);}if(event==='SIGNED_OUT'){viewEpoch++;login();}});
+  async function start(){try{const session=check(await api.auth.getSession()).session;if(recovering&&session)passwordForm();else if(session)await enter();else login();}catch(e){login();message(readableError(e),true);}}
+  start();
+
+})();
+
+}catch(e){document.getElementById('team-message').textContent=e.message;}}
+launchTeam();
+</script></body></html>
