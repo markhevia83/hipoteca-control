@@ -1,4 +1,4 @@
-const CACHE = "hipoteca-control-v5-tabs";
+const CACHE = "hipoteca-control-v6-plazo";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./client-report.js?v=1", "./vendor/jspdf-4.2.1.umd.min.js"];
 self.addEventListener('message', event => {
   if (event.data === 'hc-team-cache-safe') event.ports[0]?.postMessage(true);
