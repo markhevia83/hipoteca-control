@@ -78,18 +78,36 @@
     doc.setProperties({title:'Asesoramiento hipotecario',author:'Hipoteca Control',subject:'Resumen para el cliente'});
     return doc;
   }
+  function buildShort(c,f,JsPDF) {
+    if(!(Number(c.price)>0) || !c.community || !present(c.savings) || !f.termYears || !(f.mortgage>0) || !Number.isFinite(f.mortgagePayment))
+      throw new Error('Completa el precio, la comunidad, los ahorros y un plazo permitido antes de generar el resumen.');
+    const doc=new JsPDF({unit:'mm',format:'a4',compress:true});
+    const clean=v=>String(v).replace(/\u202f|\u00a0/g,' ');
+    doc.setFillColor('#153a33');doc.rect(0,0,210,32,'F');
+    doc.setTextColor('#ffffff');doc.setFont('helvetica','bold');doc.setFontSize(20);doc.text('hipoteca.',18,20);
+    doc.setTextColor('#153a33');doc.setFontSize(20);doc.text('Resumen de financiación',18,54);
+    [['Importe de hipoteca solicitado',money(f.mortgage)],['Cuota hipotecaria inicial estimada',money(f.mortgagePayment)+' / mes']].forEach(([label,value],i)=>{
+      const y=72+i*48;doc.setFillColor('#edf5f1');doc.roundedRect(18,y,174,39,3,3,'F');
+      doc.setFont('helvetica','normal');doc.setFontSize(11);doc.text(label,25,y+12);
+      doc.setFont('helvetica','bold');doc.setFontSize(25);doc.text(clean(value),25,y+29);
+    });
+    const note='Estimación sujeta al estudio y aprobación de la entidad. '+(c.mortgageType==='fija'?'':'La cuota puede variar tras las revisiones del tipo de interés. ')+'La cuota mostrada no incluye seguros ni otros pagos mensuales. El desglose de costes y condiciones figura en el informe completo.';
+    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor('#5d706a');doc.text(doc.splitTextToSize(note,172),19,180);
+    doc.setFontSize(8);doc.text('Hipoteca Control · Documento orientativo',18,285);
+    doc.setProperties({title:'Resumen de financiación',author:'Hipoteca Control'});return doc;
+  }
   function bind(root,c,getComputed,render) {
     root.querySelector('[data-add-offer]')?.addEventListener('click',()=>{(c.offers ||= []).push({});render();});
     root.querySelectorAll('[data-remove-offer]').forEach(b=>b.onclick=()=>{c.offers.splice(+b.dataset.removeOffer,1);render();});
     root.querySelectorAll('[data-offer]').forEach(el=>{el.oninput=el.onchange=()=>{c.offers[+el.dataset.offer][el.dataset.field]=el.value;};});
     // Also makes existing form labels accessible without altering the current layout.
     root.querySelectorAll('input,select,textarea').forEach((el,i)=>{if(!el.id)el.id=`hc-field-${i}`;const label=el.previousElementSibling;if(label?.tagName==='LABEL')label.htmlFor=el.id;});
-    root.querySelector('[data-client-pdf]')?.addEventListener('click',()=>{
+    root.querySelectorAll('[data-client-pdf]').forEach(button=>button.addEventListener('click',()=>{
       try {
         if(!scope.jspdf?.jsPDF)throw new Error('No se ha podido cargar el generador. Recarga la página y vuelve a intentarlo.');
-        const snapshot=structuredClone(c), doc=build(snapshot,getComputed(),scope.jspdf.jsPDF), blob=doc.output('blob');
+        const short=button.dataset.clientPdf==='short', snapshot=structuredClone(c), doc=(short?buildShort:build)(snapshot,getComputed(),scope.jspdf.jsPDF), blob=doc.output('blob');
         const slug=(snapshot.name||'cliente').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').slice(0,70);
-        const name=`Asesoramiento-${slug}-${snapshot.adviceDate||today()}.pdf`;
+        const name=`${short?'Resumen':'Asesoramiento'}-${slug}-${snapshot.adviceDate||today()}.pdf`;
         const dialog=document.createElement('dialog');dialog.className='hc-pdf-dialog';
         dialog.innerHTML='<h2>PDF para el cliente</h2><p>Incluye los datos actuales, también los cambios sin guardar. Revisa el documento antes de compartirlo.</p><div class="hc-pdf-actions"><a class="hc-primary" data-download>Descargar PDF</a><button class="hc-subtle" data-share>Compartir PDF</button><button class="hc-subtle" data-close>Cerrar</button></div><p role="status" data-pdf-status></p>';
         root.append(dialog);
@@ -100,7 +118,8 @@
         dialog.querySelector('[data-close]').onclick=()=>dialog.close();
         dialog.addEventListener('close',()=>{URL.revokeObjectURL(url);dialog.remove();},{once:true});dialog.showModal();
       } catch(e) {alert('No se ha podido generar el PDF. '+e.message);}
-    });
+    }));
   }
-  scope.HCReport={details,operation,comparisons,bind,build,today};
+  scope.HCReport={details,operation,comparisons,bind,build,buildShort,today};
 })(typeof window!=='undefined'?window:globalThis);
+
