@@ -1,4 +1,4 @@
-const CACHE = "hipoteca-control-v8-autoguardado-pdf";
+const CACHE = "hipoteca-control-v9-equipo-sincronizado";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./client-report.js?v=2", "./vendor/jspdf-4.2.1.umd.min.js"];
 self.addEventListener('message', event => {
   if (event.data === 'hc-team-cache-safe') event.ports[0]?.postMessage(true);
