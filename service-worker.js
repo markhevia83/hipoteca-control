@@ -1,5 +1,5 @@
-const CACHE = "hipoteca-control-v9-equipo-sincronizado";
-const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./client-report.js?v=2", "./vendor/jspdf-4.2.1.umd.min.js"];
+const CACHE = "hipoteca-control-v10-copias-locales";
+const ASSETS = ["./", "./index.html", "./local-backup.js", "./manifest.webmanifest", "./icon.svg", "./client-report.js?v=2", "./vendor/jspdf-4.2.1.umd.min.js"];
 self.addEventListener('message', event => {
   if (event.data === 'hc-team-cache-safe') event.ports[0]?.postMessage(true);
 });
@@ -33,4 +33,5 @@ self.addEventListener("fetch", event => {
     return response;
   }).catch(() => caches.match("./index.html"))));
 });
+
 

@@ -68,11 +68,11 @@
   @media (max-width:460px) { #hc-app .hc-fields, #hc-app .hc-modes { grid-template-columns:1fr; } #hc-app .hc-case { grid-template-columns:1fr auto; } #hc-app .hc-case button { grid-column:1/-1; } }
 
 #team-account{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 24px;background:#153a33;color:white}#team-account:empty{display:none}#team-account nav{display:flex;gap:8px;flex-wrap:wrap}#team-account button{border:1px solid #92b6aa;color:white;background:transparent;padding:8px;border-radius:6px}#team-message{max-width:1000px;margin:12px auto;padding:8px 16px;min-height:24px}#team-message:empty{padding:0;min-height:0}#team-message.error{color:#9c2117}#hc-app .team-login{max-width:440px;margin:70px auto;padding:28px;background:white;border-radius:16px;border:1px solid #d5e1dc}#hc-app .team-login label{margin-top:18px}#hc-app form button{margin-top:20px}#hc-app .team-login details{margin-bottom:20px}#hc-app .team-notice{font-size:16px;line-height:1.6;color:#153a33;margin:24px 0}#team-directory{display:grid;gap:10px}#hc-app .hc-top{display:none}
-</style><script src="vendor/jspdf-4.2.1.umd.min.js"></script><script src="client-report.js?v=2"></script><style>.hc-pdf-actions{display:flex;gap:10px;flex-wrap:wrap}.hc-pdf-dialog{max-width:560px;width:calc(100% - 48px);border:1px solid #d5e1dc;border-radius:14px;padding:24px;color:#153a33;background:white}.hc-pdf-dialog::backdrop{background:#153a3388}.hc-pdf-dialog a{display:inline-block;text-decoration:none;border-radius:8px;padding:10px 13px}.hc-pdf-dialog p{line-height:1.5}</style></head><body><header id="team-account"></header><div id="team-message" role="status"></div><main id="hc-app"></main><noscript>Activa JavaScript para abrir tu espacio de trabajo.</noscript><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.102.0/dist/umd/supabase.js" integrity="sha384-poKfwTwdwtKSNytBl3naRZbL6oWsW0sXebHBBcIdv25HCh9elYfWO0B7QjfL8yZq" crossorigin="anonymous"></script><script>
+</style><script src="vendor/jspdf-4.2.1.umd.min.js"></script><script src="client-report.js?v=2"></script><style>.hc-pdf-actions{display:flex;gap:10px;flex-wrap:wrap}.hc-pdf-dialog{max-width:560px;width:calc(100% - 48px);border:1px solid #d5e1dc;border-radius:14px;padding:24px;color:#153a33;background:white}.hc-pdf-dialog::backdrop{background:#153a3388}.hc-pdf-dialog a{display:inline-block;text-decoration:none;border-radius:8px;padding:10px 13px}.hc-pdf-dialog p{line-height:1.5}</style></head><body><header id="team-account"></header><div id="team-message" role="status"></div><main id="hc-app"><section class="team-login"><h1>Hipoteca Control</h1><p>Conectando con el equipo…</p><p><a href="./index.html">Trabajar en este dispositivo sin iniciar sesión</a></p><p>Los expedientes locales son independientes del equipo y no se sincronizan con otros dispositivos.</p></section></main><noscript>Activa JavaScript para abrir tu espacio de trabajo.</noscript><script src="team-storage.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.102.0/dist/umd/supabase.js" integrity="sha384-poKfwTwdwtKSNytBl3naRZbL6oWsW0sXebHBBcIdv25HCh9elYfWO0B7QjfL8yZq" crossorigin="anonymous"></script><script>
 async function prepareTeamCache(){
  if(!('serviceWorker' in navigator))return;
  const registration=await navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'});
- await registration.update();
+ try{await registration.update();}catch{} // An installed safe worker can still answer offline.
  const deadline=Date.now()+15000;
  while(Date.now()<deadline){
    const safe=await new Promise(resolve=>{const channel=new MessageChannel();const timeout=setTimeout(()=>{channel.port1.close();resolve(false)},300);channel.port1.onmessage=e=>{clearTimeout(timeout);channel.port1.close();resolve(e.data===true)};navigator.serviceWorker.controller?.postMessage('hc-team-cache-safe',[channel.port2]);});
@@ -100,7 +100,7 @@ try{await prepareTeamCache();if(!window.supabase)throw Error('No se ha podido ca
   const moneyFields = () => { const c=current, policy=termPolicy(c), base=+c.price||0, itp=c.community ? base*(rates[c.community]/100) : 0, costs=itp+(+c.fixed||0)+(+c.agency||0)+(+c.finance||0), baseMortgage=Math.max(0,base+costs-(+c.savings||0)), openingFee=baseMortgage*(+c.openingCommission||0)/100, mortgage=baseMortgage+(c.financeCommission?openingFee:0), loanMonthly=(c.loans||[]).reduce((sum,l)=>sum+(+l.payment||0),0), incomeMonthly=c.applicants.reduce((sum,a)=>sum+(a.employment==='ajena'?(+a.income||0)*(+a.pays||0)/12:(+a.monthlyProfit||(+a.annualProfit||0)/12)),0), maxDebt=incomeMonthly*.35, productsMonthly=(+c.insurance||0)+(+c.pensionPlan||0)+(+c.paymentProtection||0), available=maxDebt-loanMonthly-productsMonthly, termYears=policy.termAllowed?policy.requestedTerm:0, months=termYears*12, firstRate=c.mortgageType==='variable'?(+c.variableRate||0):(+c.rate||0), mortgagePayment=annuity(mortgage,firstRate,months), debtMonthly=loanMonthly+productsMonthly+mortgagePayment; return {...policy,itp,costs,baseMortgage,openingFee,mortgage,pct:base?mortgage/base*100:0,loanMonthly,incomeMonthly,maxDebt,productsMonthly,available,termYears,mortgagePayment,debtMonthly,debtRatio:incomeMonthly&&termYears?debtMonthly/incomeMonthly*100:0}; };
   function amortization(){ const f=moneyFields(), c=current, months=f.termYears*12; if(!months||!f.mortgage) return []; let balance=f.mortgage, payment=annuity(balance,c.mortgageType==='variable'?(+c.variableRate||0):(+c.rate||0),months), rows=[], mixedAt=Math.min(months,(+c.mixedYears||0)*12); for(let n=1;n<=months;n++){ const annual=c.mortgageType==='fija'?(+c.rate||0):c.mortgageType==='variable'?(+c.variableRate||0):(n>mixedAt?(+c.variableRate||0):(+c.rate||0)); if(c.mortgageType==='mixta'&&n===mixedAt+1) payment=annuity(balance,annual,months-mixedAt); const interest=balance*annual/1200, principal=Math.min(balance,Math.max(0,payment-interest)), paid=principal+interest; balance=Math.max(0,balance-principal); rows.push({n,paid,interest,principal,balance}); } return rows; }
   function dashboard(){ current=null; root.innerHTML=`<div class="hc-top"><div class="hc-brand">hipoteca.<small>Asesoramientos</small></div></div><div class="hc-shell"><div class="hc-head"><div><div class="hc-eyebrow">Tu cartera de clientes</div><h1>Todos los expedientes</h1><p>Expedientes sincronizados con tu cuenta. Usa la misma cuenta en móvil y ordenador.</p></div><button class="hc-primary" data-new>Nuevo expediente</button></div><div class="hc-grid"><div class="hc-card hc-stat"><span>Expedientes activos</span><strong>${cases.filter(c=>c.status!=='Firmada').length}</strong></div><div class="hc-card hc-stat"><span>Gestiones registradas</span><strong>${cases.reduce((n,c)=>n+(c.followups||[]).length,0)}</strong></div><div class="hc-card hc-stat"><span>Hipotecas firmadas</span><strong>${cases.filter(c=>c.status==='Firmada').length}</strong></div></div><div class="hc-head"><h2>Asesoramientos</h2><button class="hc-subtle" data-new>+ Crear expediente</button></div><div class="hc-list">${cases.length?cases.map(c=>`<div class="hc-case"><div><strong>${safe(c.name||'Expediente sin nombre')}</strong><small>${safe(c.applicants.map(a=>a.name).filter(Boolean).join(' · ')||'Sin titulares indicados')}</small></div><span class="hc-badge">${safe(c.status)}</span><button class="hc-subtle" data-open="${c.id}">Abrir</button></div>`).join(''):'<div class="hc-empty">Aún no hay expedientes. Crea el primero para empezar.</div>'}</div></div>`; root.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>edit(fresh())); root.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>edit(cases.find(c=>c.id===b.dataset.open))); teamDashboard(); }
-  function edit(c){ current=structuredClone(c); current.followups ||= []; current.loans ||= []; current.rate ||= '3'; current.variableRate ||= '3.5'; current.mortgageType ||= 'fija'; current.mixedYears ||= '5'; current.openingCommission ||= '0'; current.insurance ||= '0'; current.pensionPlan ||= '0'; current.paymentProtection ||= '0'; while(current.applicants.length<2) current.applicants.push(applicant()); tab='datos'; savedSnapshot=JSON.stringify(current); render(); }
+  function edit(c){ viewEpoch++;current=structuredClone(c); current.followups ||= []; current.loans ||= []; current.rate ||= '3'; current.variableRate ||= '3.5'; current.mortgageType ||= 'fija'; current.mixedYears ||= '5'; current.openingCommission ||= '0'; current.insurance ||= '0'; current.pensionPlan ||= '0'; current.paymentProtection ||= '0'; while(current.applicants.length<2) current.applicants.push(applicant()); tab='datos'; savedSnapshot=draftBases.has(current.id)?JSON.stringify(records.get(current.id)?.payload||null):JSON.stringify(current);localSaved=false; render(); }
   function summaryView(){ const f=moneyFields(), room=f.available-f.mortgagePayment; return `<h2>Resumen económico</h2><dl><div><dt>Precio vivienda</dt><dd>${euro(current.price)}</dd></div><div><dt>ITP estimado</dt><dd>${current.community?euro(f.itp):'Pendiente'}</dd></div><div><dt>Total gastos</dt><dd>${euro(f.costs)}</dd></div><div><dt>Ahorros</dt><dd>${euro(current.savings)}</dd></div><div><dt>Hipoteca necesaria</dt><dd>${euro(f.mortgage)}</dd></div><div><dt>Financiación / precio</dt><dd>${current.price?f.pct.toFixed(1)+' %':'—'}</dd></div></dl><h3 style="margin:18px 0 4px">Capacidad de endeudamiento</h3><dl><div><dt>Ingresos netos / mes</dt><dd>${euro(f.incomeMonthly)}</dd></div><div><dt>Límite al 35 %</dt><dd>${euro(f.maxDebt)}</dd></div><div><dt>Cuotas de préstamos</dt><dd>${euro(f.loanMonthly)}</dd></div><div><dt>Margen para nueva hipoteca</dt><dd>${euro(f.available)}</dd></div><div><dt>Plazo máximo permitido</dt><dd>${f.olderAge?f.applicableLimit+' años':'Pendiente'}</dd></div><div><dt>Plazo elegido</dt><dd>${f.termYears?f.termYears+' años':'Pendiente'}</dd></div><div><dt>Nueva hipoteca estimada</dt><dd>${f.termYears?euro(f.mortgagePayment):'Pendiente'}</dd></div><div><dt>Resultado de la operación</dt><dd>${f.incomeMonthly&&f.termYears?(room>=0?'Dentro del margen':'Supera '+euro(Math.abs(room))):'Pendiente'}</dd></div><div><dt>Endeudamiento total</dt><dd>${f.incomeMonthly&&f.termYears?f.debtRatio.toFixed(1)+' %':'Pendiente'}</dd></div></dl>`; }
   function render(){ root.innerHTML=`<div class="hc-top"><div class="hc-brand">hipoteca.<small>Asesoramientos</small></div></div><div class="hc-shell"><div class="hc-head"><div><button class="hc-subtle" data-back>← Expedientes</button><div class="hc-eyebrow">Nuevo asesoramiento</div><h1>${safe(current.name||'Nuevo expediente')}</h1></div><div class="hc-pdf-actions"><button class="hc-primary" data-client-pdf>PDF completo</button><button class="hc-subtle" data-client-pdf="short">PDF resumido</button><button class="hc-subtle" data-save>Guardar expediente</button></div></div><div class="hc-block"><div class="hc-fields"><div><label>Nombre del expediente *</label><input data-root="name" value="${safe(current.name)}" placeholder="Ej. Familia García"></div><div><label>Estado</label><select data-root="status">${option(['Nuevo','En estudio','Pendiente de documentación','Firmada','Descartada'],current.status)}</select></div></div></div><div class="hc-tabs" role="tablist" aria-label="Secciones del asesoramiento"><button class="${tab==='datos'?'hc-active':''}" data-tab="datos" role="tab" id="hc-tab-datos" aria-controls="hc-panel" aria-selected="${tab==='datos'}" tabindex="${tab==='datos'?'0':'-1'}">Cuestionario</button><button class="${tab==='calculo'?'hc-active':''}" data-tab="calculo" role="tab" id="hc-tab-calculo" aria-controls="hc-panel" aria-selected="${tab==='calculo'}" tabindex="${tab==='calculo'?'0':'-1'}">Operación de compra</button><button class="${tab==='seguimiento'?'hc-active':''}" data-tab="seguimiento" role="tab" id="hc-tab-seguimiento" aria-controls="hc-panel" aria-selected="${tab==='seguimiento'}" tabindex="${tab==='seguimiento'?'0':'-1'}">Seguimiento</button></div><div class="hc-layout"><div id="hc-panel" role="tabpanel" aria-labelledby="hc-tab-${tab}">${tab==='datos'?dataView():tab==='calculo'?calculatorView():followupView()}</div><aside class="hc-card hc-summary">${summaryView()}</aside></div></div>`; bind(); }
   function applicantView(a,i){ const k=`data-ai="${i}"`; return `<section class="hc-block"><h2>Titular ${i+1}</h2><div class="hc-fields"><div><label>Nombre</label><input ${k} data-field="name" value="${safe(a.name)}"></div><div><label>Edad</label><input type="number" ${k} data-field="age" value="${safe(a.age)}"></div></div><div class="hc-mode"><label>Situación laboral</label><div class="hc-modes"><label><input type="radio" name="employment-${i}" ${k} data-field="employment" value="ajena" ${a.employment==='ajena'?'checked':''}> Trabajador por cuenta ajena</label><label><input type="radio" name="employment-${i}" ${k} data-field="employment" value="propia" ${a.employment==='propia'?'checked':''}> Trabajador por cuenta propia</label></div></div>${a.employment==='ajena'?`<div class="hc-fields"><div><label>Tipo de contrato</label><select ${k} data-field="contract">${option(['Pendiente','Indefinido','Temporal','Funcionario','Fijo discontinuo','Otro'],a.contract||'Pendiente')}</select></div><div><label>Antigüedad laboral</label><input ${k} data-field="tenure" value="${safe(a.tenure)}" placeholder="Ej. 3 años y 4 meses"></div><div><label>Ingresos netos por paga (€)</label><input type="number" ${k} data-field="income" value="${safe(a.income)}"></div><div><label>Número de pagas</label><input type="number" ${k} data-field="pays" value="${safe(a.pays)}"></div></div>`:`<div class="hc-fields"><div><label>Actividad profesional o empresa</label><input ${k} data-field="activity" value="${safe(a.activity)}"></div><div><label>Antigüedad como autónomo</label><input ${k} data-field="autonomoYears" value="${safe(a.autonomoYears)}" placeholder="Ej. 4 años"></div><div><label>Rendimiento neto mensual (€)</label><input type="number" ${k} data-field="monthlyProfit" value="${safe(a.monthlyProfit)}"></div><div><label>Beneficio neto anual declarado (€)</label><input type="number" ${k} data-field="annualProfit" value="${safe(a.annualProfit)}"></div></div>`}<div class="hc-fields" style="margin-top:12px"><div><label>Banco o bancos</label><input ${k} data-field="bank" value="${safe(a.bank)}"></div><div><label>¿Figura en ASNEF?</label><select ${k} data-field="asnef">${option(['Pendiente','Sí','No'],a.asnef)}</select></div></div></section>`; }
@@ -126,47 +126,54 @@ try{await prepareTeamCache();if(!window.supabase)throw Error('No se ha podido ca
     if(expanded && output.querySelector('details')) output.querySelector('details').open=true;
     if(shouldExpand && output.querySelector('details')){output.querySelector('details').open=true;output.scrollIntoView({behavior:'smooth',block:'start'});}
   }
-  function bind(){ HCReport.bind(root,current,moneyFields,render); root.querySelector('[data-back]').onclick=async()=>{if(await leave())await loadCases()}; root.querySelectorAll('[data-tab]').forEach(b=>{const activate=key=>{tab=key;render();const selected=root.querySelector('[data-tab="'+key+'"]');selected.focus({preventScroll:true});root.querySelector('.hc-tabs').scrollIntoView({block:'start'});};b.onclick=()=>activate(b.dataset.tab);b.onkeydown=e=>{const keys=['datos','calculo','seguimiento'],i=keys.indexOf(b.dataset.tab);let next;if(e.key==='ArrowRight')next=keys[(i+1)%3];if(e.key==='ArrowLeft')next=keys[(i+2)%3];if(e.key==='Home')next=keys[0];if(e.key==='End')next=keys[2];if(next){e.preventDefault();activate(next);}};}); root.querySelectorAll('[data-root]').forEach(el=>{const sync=()=>{current[el.dataset.root]=el.value;updateComputed()};if(['calculationProduct','termYears'].includes(el.dataset.root)){el.onchange=()=>{current[el.dataset.root]=el.value;render()}}else{el.oninput=sync;el.onchange=sync}}); root.querySelectorAll('[data-check]').forEach(el=>el.onchange=()=>{current[el.dataset.check]=el.checked;updateComputed()}); root.querySelector('[data-calculate]')?.addEventListener('click',()=>updateComputed()); root.querySelectorAll('[data-ai]').forEach(el=>{const set=()=>{const a=current.applicants[+el.dataset.ai];a[el.dataset.field]=el.value;if(el.dataset.field==='employment')render();else updateComputed()};el.onchange=set;el.oninput=el.type==='number'||el.type==='text'?set:null}); root.querySelector('[data-add-loan]')?.addEventListener('click',()=>{current.loans.push({holder:'Titular 1',bank:'',concept:'',payment:'',balance:''});render()}); root.querySelectorAll('[data-loan]').forEach(el=>{const set=()=>{current.loans[+el.dataset.loan][el.dataset.field]=el.value;updateComputed()};el.oninput=set;el.onchange=set}); root.querySelectorAll('[data-remove-loan]').forEach(b=>b.onclick=()=>{current.loans.splice(+b.dataset.removeLoan,1);render()}); root.querySelector('[data-save]').onclick=saveTeam; root.querySelector('[data-followup]')?.addEventListener('click',()=>{const note=prompt('Describe la gestión:');if(note?.trim()){current.followups.unshift({date:new Date().toLocaleDateString('es-ES'),note});render()}}); }
+  function bind(){ HCReport.bind(root,current,moneyFields,render);bindDraftRecovery(); root.querySelector('[data-back]').onclick=async()=>{if(await leave()){if(draftBases.size){dashboard();message('Borradores conservados en este navegador; pendientes de sincronizar.');}else await loadCases()}}; root.querySelectorAll('[data-tab]').forEach(b=>{const activate=key=>{tab=key;render();const selected=root.querySelector('[data-tab="'+key+'"]');selected.focus({preventScroll:true});root.querySelector('.hc-tabs').scrollIntoView({block:'start'});};b.onclick=()=>activate(b.dataset.tab);b.onkeydown=e=>{const keys=['datos','calculo','seguimiento'],i=keys.indexOf(b.dataset.tab);let next;if(e.key==='ArrowRight')next=keys[(i+1)%3];if(e.key==='ArrowLeft')next=keys[(i+2)%3];if(e.key==='Home')next=keys[0];if(e.key==='End')next=keys[2];if(next){e.preventDefault();activate(next);}};}); root.querySelectorAll('[data-root]').forEach(el=>{const sync=()=>{current[el.dataset.root]=el.value;updateComputed()};if(['calculationProduct','termYears'].includes(el.dataset.root)){el.onchange=()=>{current[el.dataset.root]=el.value;render()}}else{el.oninput=sync;el.onchange=sync}}); root.querySelectorAll('[data-check]').forEach(el=>el.onchange=()=>{current[el.dataset.check]=el.checked;updateComputed()}); root.querySelector('[data-calculate]')?.addEventListener('click',()=>updateComputed()); root.querySelectorAll('[data-ai]').forEach(el=>{const set=()=>{const a=current.applicants[+el.dataset.ai];a[el.dataset.field]=el.value;if(el.dataset.field==='employment')render();else updateComputed()};el.onchange=set;el.oninput=el.type==='number'||el.type==='text'?set:null}); root.querySelector('[data-add-loan]')?.addEventListener('click',()=>{current.loans.push({holder:'Titular 1',bank:'',concept:'',payment:'',balance:''});render()}); root.querySelectorAll('[data-loan]').forEach(el=>{const set=()=>{current.loans[+el.dataset.loan][el.dataset.field]=el.value;updateComputed()};el.oninput=set;el.onchange=set}); root.querySelectorAll('[data-remove-loan]').forEach(b=>b.onclick=()=>{current.loans.splice(+b.dataset.removeLoan,1);render()}); root.querySelector('[data-save]').onclick=saveTeam; root.querySelector('[data-followup]')?.addEventListener('click',()=>{const note=prompt('Describe la gestión:');if(note?.trim()){current.followups.unshift({date:new Date().toLocaleDateString('es-ES'),note});render()}}); }
   const NOTICE='Espacio de trabajo de la empresa. La administración puede consultar los asesoramientos registrados.';
+  const authStorage=HCTeamStorage.authStorage(localStorage,sessionStorage);
   const api=window.supabase.createClient('https://qfogjutoaoacmuuqvrgc.supabase.co','sb_publishable_NgQpq33LyVYC2EWuIWM-sw_CmfSWhD6',{
-    auth:{storage:sessionStorage,storageKey:'hc-team-auth-v1',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+    auth:{storage:authStorage,storageKey:'hc-team-auth-v1',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
   });
-  let member=null,members=[],records=new Map(),savedSnapshot='',saving=false,viewEpoch=0,autoTimer=null,savePromise=null;
-  ['input','change','click'].forEach(type=>root.addEventListener(type,()=>{if(member&&dirty()){clearTimeout(autoTimer);message('Cambios pendientes de sincronizar…');autoTimer=setTimeout(()=>saveTeam(),700);}}));
+  const volatileDrafts=new Map();
+  let expectedAccount=null,member=null,members=[],records=new Map(),savedSnapshot='',saving=false,viewEpoch=0,autoTimer=null,savePromise=null,localDrafts=null,draftBases=new Map(),localSaved=false;
+  ['input','change','click'].forEach(type=>root.addEventListener(type,()=>{if(member&&dirty()){clearTimeout(autoTimer);persistDraft();autoTimer=setTimeout(()=>saveTeam(),700);}}));
   window.addEventListener('online',()=>{if(member&&dirty())saveTeam();else if(member&&!current)loadCases();});
   window.addEventListener('focus',()=>{if(member&&!current)loadCases();});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden&&member&&dirty())saveTeam();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&member&&dirty()){persistDraft();saveTeam();}});
   const accountBar=document.getElementById('team-account');
   const messageBox=document.getElementById('team-message');
   function message(text,error=false){messageBox.textContent=text;messageBox.setAttribute('role',error?'alert':'status');messageBox.className=error?'error':'';}
   function check(result){if(result.error)throw result.error;return result.data;}
   function dirty(){return current && JSON.stringify(current)!==savedSnapshot;}
-  async function leave(){clearTimeout(autoTimer);return !dirty()||await saveTeam();}
-  window.addEventListener('beforeunload',e=>{if(dirty()){e.preventDefault();e.returnValue='';}});
+  async function leave(){clearTimeout(autoTimer);if(!dirty())return true;persistDraft();if(await saveTeam())return true;return !!current&&persistDraft();}
+  window.addEventListener('beforeunload',e=>{if(volatileDrafts.size||(dirty()&&!persistDraft())){e.preventDefault();e.returnValue='';}});
   function readableError(e){
-    if(e?.message?.includes('Invalid login'))return 'El correo o la contraseña no son correctos.';
+    if(e?.code==='invalid_credentials'||e?.message==='Invalid login credentials')return 'El correo o la contraseña no son correctos.';
     if(e?.message?.includes('Email not confirmed'))return 'Confirma tu correo antes de entrar.';
     if(e?.message?.includes('email_address_not_authorized')||e?.code==='email_address_not_authorized')return 'El envío de correos todavía necesita configuración. Contacta con la administración.';
     if(e?.status===429)return 'Demasiados intentos. Espera unos minutos y vuelve a intentarlo.';
-    return e?.message?.startsWith('CONFLICT:')?e.message.slice(9):'No se ha podido completar la operación. Comprueba la conexión y vuelve a intentarlo. Tus cambios en pantalla se conservan.';
+    if(e?.name==='AuthRetryableFetchError'||e instanceof TypeError||e?.status>=500)return 'El servicio de acceso o sincronización no está disponible. No se han podido verificar las credenciales. Vuelve a intentarlo cuando se restablezca el servicio.';
+    return e?.message?.startsWith('CONFLICT:')?e.message.slice(9):'No se ha podido completar la operación. Comprueba la conexión y vuelve a intentarlo. Los cambios siguen en pantalla; comprueba el estado de la copia local antes de cerrar.';
   }
   function account(){
-    accountBar.innerHTML=member?`<span>${safe(member.display_name)} · ${member.role==='admin'?'Administrador':'Empleado'}</span><nav><button id="team-info">Información de la cuenta</button>${member.role==='admin'?'<button id="team-manage">Equipo</button>':''}<button id="team-out">Cerrar sesión</button></nav>`:'';
+    accountBar.innerHTML=member?`<span>${safe(member.display_name)} · ${member.role==='admin'?'Administrador':'Empleado'}</span><nav><button id="team-local">${authStorage.remember?'Dispositivo recordado':'Recordar este dispositivo'}</button><button id="team-export">Descargar copia JSON</button><button id="team-recovery-export">Descargar copias de recuperación</button><button id="team-info">Información de la cuenta</button>${member.role==='admin'?'<button id="team-manage">Equipo</button>':''}<button id="team-out">Cerrar sesión</button></nav>`:'';
+    document.getElementById('team-local')?.addEventListener('click',async()=>{if(authStorage.remember){alert('La sesión y los borradores pendientes se conservan en este navegador. Cierra sesión al terminar si compartes el dispositivo. Las copias locales no se sincronizan entre dispositivos.');return;}if(!confirm('¿Es tu dispositivo personal? Se guardarán la sesión y copias locales de tus cambios pendientes. Cualquier persona con acceso a este navegador podría leerlos. No lo actives en un equipo compartido.'))return;try{authStorage.choose(true);const session=check(await api.auth.getSession()).session;if(session)authStorage.setItem('hc-team-auth-v1',JSON.stringify(session));localDrafts=HCTeamStorage.drafts(localStorage,member.user_id);persistDraft();account();message('Dispositivo recordado. Los nuevos cambios tendrán copia local.');}catch(e){message('No se ha podido activar el guardado local. Mantén esta página abierta.',true);}});
+    document.getElementById('team-export')?.addEventListener('click',exportLocal);
+    document.getElementById('team-recovery-export')?.addEventListener('click',exportRecovery);
     document.getElementById('team-info')?.addEventListener('click',()=>alert(NOTICE));
     document.getElementById('team-manage')?.addEventListener('click',async()=>{if(await leave())manageTeam();});
     document.getElementById('team-out')?.addEventListener('click',async()=>{
       if(!await leave())return;
-      viewEpoch++;current=null;cases=[];records.clear();members=[];member=null;account();root.innerHTML='';
-      const result=await api.auth.signOut({scope:'local'});
+      viewEpoch++;current=null;cases=[];records.clear();members=[];member=null;localDrafts=null;draftBases.clear();account();root.innerHTML='';
+      let result;try{result=await api.auth.signOut({scope:'local'});}catch(error){result={error};}finally{await api.auth.stopAutoRefresh();authStorage.removeItem('hc-team-auth-v1');}
       login();message(result.error?'Sesión cerrada en este dispositivo. Comprueba la conexión antes de volver a entrar.':'Sesión cerrada.',!!result.error);
     });
   }
   function login(){
-    current=null;member=null;cases=[];records.clear();members=[];account();
-    root.innerHTML=`<section class="hc-shell team-login"><div class="hc-eyebrow">Hipoteca Control · Equipo</div><h1>Tu espacio de trabajo</h1><p>Entra con tu cuenta para continuar tus asesoramientos.</p><form id="team-login"><label for="team-email">Correo electrónico</label><input id="team-email" type="email" autocomplete="username" required><label for="team-password">Contraseña</label><input id="team-password" type="password" autocomplete="current-password" required><button class="hc-primary" type="submit">Entrar</button></form><details><summary>Primer acceso</summary><p>Si la administración ha habilitado tu correo, crea tu contraseña y confirma el mensaje que recibirás.</p><button class="hc-subtle" id="team-register">Crear mi cuenta</button></details><button class="hc-subtle" id="team-reset">He olvidado mi contraseña</button><p><a href="./index.html">Abrir mis expedientes de este ordenador</a></p></section>`;
+    clearTimeout(autoTimer);current=null;member=null;localDrafts=null;draftBases.clear();cases=[];records.clear();members=[];account();
+    root.innerHTML=`<section class="hc-shell team-login"><div class="hc-eyebrow">Hipoteca Control · Equipo</div><h1>Tu espacio de trabajo</h1><div class="hc-mode"><p><a class="hc-primary" style="display:inline-block;padding:12px;border-radius:8px;text-decoration:none" href="./index.html">Trabajar en este dispositivo sin iniciar sesión</a></p><p>Los expedientes locales son independientes de los del equipo. Se guardan solo en este navegador y no se sincronizan con otros dispositivos. No se copiarán datos automáticamente.</p></div><h2>Acceso al equipo</h2><p>Entra con tu cuenta para abrir los expedientes compartidos del equipo. Requiere conexión y servicio activo.</p><form id="team-login"><label for="team-email">Correo electrónico</label><input id="team-email" type="email" autocomplete="username" required><label for="team-password">Contraseña</label><input id="team-password" type="password" autocomplete="current-password" required><label style="display:flex;gap:10px;align-items:start"><input id="team-remember" type="checkbox" style="width:auto;min-height:auto">Recordar sesión y guardar borradores en este dispositivo personal</label><p>No lo actives en un dispositivo compartido. Las copias quedan en este navegador; no aparecen en otros dispositivos hasta sincronizar.</p><button class="hc-primary" type="submit">Entrar</button></form><details><summary>Primer acceso</summary><p>Si la administración ha habilitado tu correo, crea tu contraseña y confirma el mensaje que recibirás.</p><button class="hc-subtle" id="team-register">Crear mi cuenta</button></details><button class="hc-subtle" id="team-reset">He olvidado mi contraseña</button></section>`;
+    document.getElementById('team-remember').checked=authStorage.remember;
     const credentials=()=>({email:document.getElementById('team-email').value.trim(),password:document.getElementById('team-password').value});
     const run=async(fn)=>{const buttons=root.querySelectorAll('button');buttons.forEach(b=>b.disabled=true);message('Conectando…');try{await fn();}catch(e){message(readableError(e),true);}finally{buttons.forEach(b=>b.disabled=false);}};
-    document.getElementById('team-login').onsubmit=e=>{e.preventDefault();run(async()=>{check(await api.auth.signInWithPassword(credentials()));await enter();});};
+    document.getElementById('team-login').onsubmit=e=>{e.preventDefault();run(async()=>{authStorage.choose(document.getElementById('team-remember').checked);check(await api.auth.signInWithPassword(credentials()));await enter();});};
     document.getElementById('team-register').closest('details').innerHTML='<summary>Primer acceso</summary><p>Abre el enlace de activación que te facilite la administración para elegir tu contraseña.</p>';
     document.getElementById('team-reset').onclick=()=>{
       message('Contacta con la administración para recuperar tu acceso. La recuperación automática por correo todavía no está habilitada.');
@@ -174,12 +181,13 @@ try{await prepareTeamCache();if(!window.supabase)throw Error('No se ha podido ca
   }
   async function enter(){
     const epoch=++viewEpoch;
-    const user=check(await api.auth.getUser()).user;
+    const user=check(await api.auth.getUser()).user;if(epoch!==viewEpoch)return;expectedAccount=user.id;
     check(await api.rpc('hc_team_join'));
     const profile=check(await api.from('hc_team_members').select('*').eq('user_id',user.id).maybeSingle());
-    if(epoch!==viewEpoch)return;
+    const verifiedSession=check(await api.auth.getSession()).session;
+    if(epoch!==viewEpoch||verifiedSession?.user?.id!==user.id)return;
     if(!profile?.active){login();message('Esta cuenta todavía no tiene acceso al equipo. Contacta con la administración.',true);return;}
-    member=profile;account();
+    expectedAccount=profile.user_id;member=profile;localDrafts=authStorage.remember?HCTeamStorage.drafts(localStorage,member.user_id):null;account();
     const notice=check(await api.from('hc_team_notices').select('accepted_at').eq('user_id',member.user_id).maybeSingle());
     if(epoch!==viewEpoch)return;
     if(!notice){
@@ -190,6 +198,7 @@ try{await prepareTeamCache();if(!window.supabase)throw Error('No se ha podido ca
       };message('');return;
     }
     await loadCases();
+    const pending=volatileDrafts.get(member?.user_id);if(pending){const row=records.get(pending.payload.id);if(row||pending.baseVersion===null){draftBases.set(pending.payload.id,pending.baseVersion);edit(pending.payload);savedSnapshot='';if(persistDraft())volatileDrafts.delete(member.user_id);}}
   }
   async function loadCases(){
     const epoch=++viewEpoch;message('Cargando asesoramientos…');
@@ -200,7 +209,7 @@ try{await prepareTeamCache();if(!window.supabase)throw Error('No se ha podido ca
       if(epoch!==viewEpoch||!member)return;
       members=profiles;records=new Map(rows.map(r=>[r.id,r]));
       cases=rows.sort((a,b)=>b.updated_at.localeCompare(a.updated_at)).map(r=>({...r.payload,id:r.id}));
-      dashboard();message('Actualizado a las '+new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}));
+      let localError=false;try{localError=restoreDrafts();}catch{localError=true;}dashboard();if(localError){message('No se pueden leer algunos borradores locales. No se han borrado ni sobrescrito. Conserva este navegador para recuperarlos.',true);return;}message('Actualizado a las '+new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})+(draftBases.size?' · Hay borradores locales pendientes. Ábrelos para sincronizar.':''));
     }catch(e){if(epoch===viewEpoch)message(readableError(e),true);}
   }
   function teamDashboard(){
@@ -211,7 +220,7 @@ try{await prepareTeamCache();if(!window.supabase)throw Error('No se ha podido ca
     document.getElementById('team-refresh').onclick=loadCases;
     document.getElementById('team-import')?.addEventListener('click',importLocal);
     root.querySelectorAll('[data-open]').forEach(b=>{
-      const record=records.get(b.dataset.open);const row=b.closest('.hc-case');row.dataset.owner=record.owner_id;
+      const record=records.get(b.dataset.open);const row=b.closest('.hc-case');row.dataset.owner=record?.owner_id||member.user_id;if(!record){const small=document.createElement('small');small.textContent='Borrador local · pendiente de sincronizar';row.firstElementChild.append(small);return;}
       const small=document.createElement('small');small.textContent=(members.find(m=>m.user_id===record.owner_id)?.display_name||'Empleado')+' · '+new Date(record.updated_at).toLocaleString('es-ES');row.firstElementChild.append(small);
     });
     document.getElementById('team-filter')?.addEventListener('change',e=>root.querySelectorAll('.hc-case').forEach(r=>r.hidden=!!e.target.value&&r.dataset.owner!==e.target.value));
@@ -221,27 +230,94 @@ try{await prepareTeamCache();if(!window.supabase)throw Error('No se ha podido ca
     if(savePromise)return savePromise;
     if(!member||!current)return false;
     if(!dirty())return true;
+    persistDraft();
     savePromise=(async()=>{
       saving=true;
       try{
         while(member&&current&&dirty()){
-          const payload=structuredClone(current),known=records.get(payload.id),epoch=viewEpoch;
-          message('Sincronizando…');
-          const result=known?await api.from('hc_team_cases').update({payload}).eq('id',payload.id).eq('version',known.version).select().maybeSingle():await api.from('hc_team_cases').insert({id:payload.id,payload}).select().single();
+          const payload=structuredClone(current),known=records.get(payload.id),epoch=viewEpoch,accountId=member.user_id;
+          const session=check(await api.auth.getSession()).session;if(session?.user?.id!==accountId||epoch!==viewEpoch)throw Error('CONFLICT:La cuenta ha cambiado. Vuelve a entrar para continuar.');
+          if(draftBases.has(payload.id)&&known&&draftBases.get(payload.id)!==known.version&&JSON.stringify(known.payload)!==JSON.stringify(payload))throw Error('CONFLICT:Hay cambios más recientes en la cuenta. Se conserva tu borrador local. Descarga la copia JSON antes de resolver el conflicto; no se sobrescribirá la cuenta.');
+          message(localSaved?'Copia local guardada · sincronizando…':'Sincronizando…');
+          const result=known?await api.from('hc_team_cases').update({payload}).eq('id',payload.id).eq('version',known.version).select().maybeSingle():await api.from('hc_team_cases').insert({id:payload.id,payload,owner_id:accountId}).select().single();
           const row=check(result);
           if(!row)throw new Error('CONFLICT:Este expediente cambió en otro dispositivo. No se ha sobrescrito. Descarga el PDF con tus cambios y vuelve a abrir el expediente.');
           if(epoch!==viewEpoch||!member||current?.id!==payload.id)return false;
           records.set(row.id,row);const i=cases.findIndex(c=>c.id===row.id);if(i<0)cases.unshift(payload);else cases[i]=payload;
           savedSnapshot=JSON.stringify(payload);
+          if(volatileDrafts.get(accountId)?.payload?.id===payload.id)volatileDrafts.delete(accountId);
+          if(localDrafts){localDrafts.acknowledge(payload);draftBases.delete(payload.id);if(dirty()){draftBases.set(payload.id,row.version);persistDraft();}}
         }
         message('Guardado en tu cuenta · disponible en móvil y ordenador.');return true;
-      }catch(e){message(readableError(e),true);return false;}
+      }catch(e){message(readableError(e)+(localSaved?' Copia local guardada; se recuperará al entrar con esta cuenta.':' No hay copia local confirmada: no cierres la página; descarga una copia JSON.'),true);return false;}
       finally{saving=false;}
     })();
     try{return await savePromise;}finally{savePromise=null;}
   }
+  function bindDraftRecovery(){
+    const known=records.get(current.id);
+    if(!known||!draftBases.has(current.id)||draftBases.get(current.id)===known.version)return;
+    const box=document.createElement('div');box.className='hc-note';
+    box.innerHTML='<p>Este borrador y la cuenta tienen versiones diferentes. No se sobrescribirá la cuenta.</p><button data-copy-draft>Guardar borrador como expediente nuevo</button> <button data-cloud-version>Descartar borrador y abrir versión de la cuenta</button>';
+    root.querySelector('.hc-head').after(box);
+    box.querySelector('[data-copy-draft]').onclick=()=>{
+      const old=structuredClone(current),copy={...structuredClone(current),id:crypto.randomUUID(),name:(current.name||'Expediente')+' (copia recuperada)'};
+      current=copy;savedSnapshot='';if(!persistDraft()){current=old;return;}
+      localDrafts.acknowledge(old);draftBases.delete(old.id);const i=cases.findIndex(c=>c.id===old.id);if(i>=0)cases[i]={...known.payload,id:known.id};edit(copy);message('Copia local recuperada como expediente nuevo. Pulsa Guardar para sincronizarla.');
+    };
+    box.querySelector('[data-cloud-version]').onclick=()=>{
+      if(!confirm('¿Descartar este borrador local y abrir la versión de la cuenta? Descarga primero la copia JSON si quieres conservar tus cambios.'))return;
+      try{localDrafts.acknowledge(current);draftBases.delete(current.id);const c={...known.payload,id:known.id},i=cases.findIndex(c=>c.id===known.id);if(i>=0)cases[i]=c;edit(c);}catch{message('No se pudo descartar el borrador. Se conserva.',true);}
+    };
+  }
+  function persistDraft(){
+    if(!member||!current||!dirty())return false;
+    localSaved=false;
+    if(!localDrafts){message('Cambios sin copia local. Activa «Recordar este dispositivo» en un dispositivo personal, o descarga una copia JSON.');return false;}
+    try{
+      const base=draftBases.has(current.id)?draftBases.get(current.id):(records.get(current.id)?.version??null);
+      localDrafts.write(current,base);draftBases.set(current.id,base);
+      const i=cases.findIndex(c=>c.id===current.id);if(i<0)cases.unshift(structuredClone(current));else cases[i]=structuredClone(current);
+      localSaved=true;message('Copia local guardada · pendiente de sincronizar.');return true;
+    }catch(e){message(e.message==='LOCAL_CONFLICT'?'Otro tabulador ha cambiado este borrador. No se sobrescribirá. Descarga una copia JSON con tus cambios.': 'No se ha podido guardar la copia local (almacenamiento lleno, bloqueado o dañado). No cierres esta página; descarga una copia JSON. Los datos anteriores no se han borrado.',true);return false;}
+  }
+  function restoreDrafts(){
+    draftBases.clear();if(!localDrafts)return;
+    const drafts=localDrafts.list();
+    for(const d of drafts){
+      const row=records.get(d.payload.id);
+      // Existing cloud records must still be visible under current server permissions.
+      if(!row&&d.baseVersion!==null)continue;
+      if(row&&JSON.stringify(row.payload)===JSON.stringify(d.payload)){localDrafts.acknowledge(d.payload);continue;}
+      draftBases.set(d.payload.id,d.baseVersion);
+      const i=cases.findIndex(c=>c.id===d.payload.id);if(i<0)cases.unshift(d.payload);else cases[i]=d.payload;
+    }
+    return drafts.errors>0;
+  }
+  function exportRecovery(){
+    if(!member||!localDrafts){message('Las copias de recuperación se crean cuando activas el guardado local.');return;}
+    try{
+      const copies=localDrafts.recoveries().filter(d=>d.baseVersion===null||records.has(d.payload.id));
+      if(!copies.length){message('No hay copias alternativas de recuperación accesibles para esta cuenta.');return;}
+      const payloads=copies.map(d=>({...d.payload,id:crypto.randomUUID(),originalCaseId:d.payload.id,name:(d.payload.name||'Expediente')+' (recuperación '+d.savedAt+')'}));
+      downloadBackup(payloads,'recuperacion');message('Copias alternativas descargadas como expedientes nuevos. Puedes recuperarlas en el modo local sin sobrescribir los originales. Contienen datos personales: guárdalas en privado.');
+    }catch{message('No se pudieron leer las copias de recuperación. No se han borrado.',true);}
+  }
+  function downloadBackup(payloads,label='copia'){
+    const blob=new Blob([JSON.stringify({format:'hipoteca-control-backup',version:1,exportedAt:new Date().toISOString(),cases:payloads},null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='hipoteca-control-'+label+'-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
+  }
+  function exportLocal(){
+    if(!member)return;
+    const payloads=cases.map(c=>structuredClone(c));
+    if(current){const i=payloads.findIndex(c=>c.id===current.id);if(i<0)payloads.push(structuredClone(current));else payloads[i]=structuredClone(current);}
+    downloadBackup(payloads);
+    message('Copia JSON descargada. Contiene datos personales: guárdala en un lugar privado.');
+  }
   async function importLocal(){
     if(member?.role!=='admin')return;
+    const accountId=member.user_id,epoch=viewEpoch;
+    const stillSameAccount=async()=>{const session=check(await api.auth.getSession()).session;if(epoch!==viewEpoch||member?.user_id!==accountId||session?.user?.id!==accountId)throw Error('Account changed during import');};
     let local;
     try{local=JSON.parse(localStorage.getItem('hipoteca-control-inline-v1')||'[]');if(!Array.isArray(local))throw Error();}
     catch{message('No se puede leer el registro local. No se ha modificado.',true);return;}
@@ -251,10 +327,12 @@ try{await prepareTeamCache();if(!window.supabase)throw Error('No se ha podido ca
     let copied=0,skipped=0;
     try{
       for(const c of local){
+        await stillSameAccount();
         if(!c||!/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(c.id)||!Array.isArray(c.applicants))throw Error('Invalid local data');
         if(records.has(c.id)){skipped++;continue;}
         const payload={...c,followups:c.followups||[],loans:c.loans||[]};
-        const result=await api.from('hc_team_cases').insert({id:c.id,payload}).select().single();
+        const result=await api.from('hc_team_cases').insert({id:c.id,payload,owner_id:accountId}).select().single();
+        await stillSameAccount();
         if(result.error?.code==='23505'){skipped++;continue;}
         const row=check(result);records.set(row.id,row);copied++;
       }
@@ -287,7 +365,22 @@ try{await prepareTeamCache();if(!window.supabase)throw Error('No se ha podido ca
   }
   let recovering=location.hash.includes('type=recovery')||location.hash.includes('type=invite');
   function passwordForm(){current=null;root.innerHTML='<section class="hc-shell team-login"><h1>Nueva contraseña</h1><form id="new-password-form"><label for="new-password">Contraseña (al menos 12 caracteres)</label><input id="new-password" type="password" autocomplete="new-password" minlength="12" required><button class="hc-primary">Guardar contraseña</button></form></section>';document.getElementById('new-password-form').onsubmit=async e=>{e.preventDefault();try{check(await api.auth.updateUser({password:document.getElementById('new-password').value}));recovering=false;await enter();message('Contraseña actualizada.');}catch(err){message(readableError(err),true);}};}
-  api.auth.onAuthStateChange((event)=>{if(event==='PASSWORD_RECOVERY'){recovering=true;setTimeout(passwordForm,0);}if(event==='SIGNED_OUT'){viewEpoch++;login();}});
+  api.auth.onAuthStateChange((event,session)=>{
+    const next=session?.user?.id||null;
+    if(next&&expectedAccount&&next!==expectedAccount){
+      const wasDirty=dirty(),kept=wasDirty?persistDraft():true;
+      if(!kept&&member&&current)volatileDrafts.set(member.user_id,{payload:structuredClone(current),baseVersion:draftBases.has(current.id)?draftBases.get(current.id):(records.get(current.id)?.version??null)});
+      expectedAccount=next;viewEpoch++;
+      login();if(!kept)message('La cuenta ha cambiado. Hay un borrador sin guardar: no cierres esta página y vuelve a la cuenta original para recuperarlo.',true);setTimeout(()=>enter().catch(e=>{login();message(readableError(e),true);}),0);return;
+    }
+    if(next)expectedAccount=next;
+    if(event==='PASSWORD_RECOVERY'){recovering=true;setTimeout(passwordForm,0);}
+    if(event==='SIGNED_OUT'){
+      const kept=!dirty()||persistDraft();viewEpoch++;
+      if(!kept&&member&&current)volatileDrafts.set(member.user_id,{payload:structuredClone(current),baseVersion:draftBases.has(current.id)?draftBases.get(current.id):(records.get(current.id)?.version??null)});
+      expectedAccount=null;login();if(!kept)message('Sesión finalizada. Hay un borrador sin guardar: no cierres esta página y vuelve a entrar con la misma cuenta para recuperarlo.',true);
+    }
+  });
   async function start(){try{const session=check(await api.auth.getSession()).session;if(recovering&&session)passwordForm();else if(session)await enter();else login();}catch(e){login();message(readableError(e),true);}}
   start();
 
@@ -296,4 +389,5 @@ try{await prepareTeamCache();if(!window.supabase)throw Error('No se ha podido ca
 }catch(e){document.getElementById('team-message').textContent=e.message;}}
 launchTeam();
 </script></body></html>
+
 
